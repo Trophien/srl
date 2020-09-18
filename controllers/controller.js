@@ -1,10 +1,6 @@
 var Database = require("../models/Database")
 var Bcrypt = require("../models/Bcrypt")
 
-function checkPassword(password) {
-    return password.match(/[a-z]+/) && password.match(/[A-Z]+/) && password.match(/[0-9]+/) ? true : false
-}
-
 exports.login = (req, res) => {
     if (req.body.username == "" || req.body.password == "")
         res.json({ error: "Something is missing!" })
