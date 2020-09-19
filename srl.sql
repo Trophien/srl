@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: 127.0.0.1
--- Létrehozás ideje: 2020. Aug 29. 20:40
--- Kiszolgáló verziója: 10.4.11-MariaDB
--- PHP verzió: 7.4.5
+-- Létrehozás ideje: 2020. Sze 19. 20:32
+-- Kiszolgáló verziója: 10.4.14-MariaDB
+-- PHP verzió: 7.4.9
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -20,24 +20,23 @@ USE `srl`;
 -- --------------------------------------------------------
 
 --
--- Tábla szerkezet ehhez a táblához `point`
---
-
-CREATE TABLE `point` (
-  `place` int(11) NOT NULL,
-  `point` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
--- --------------------------------------------------------
-
---
 -- Tábla szerkezet ehhez a táblához `racer`
 --
 
 CREATE TABLE `racer` (
   `id` varchar(200) COLLATE utf8_bin NOT NULL,
-  `username` varchar(255) COLLATE utf8_bin NOT NULL
+  `team_id` varchar(200) COLLATE utf8_bin NOT NULL,
+  `name` varchar(255) COLLATE utf8_bin NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--
+-- A tábla adatainak kiíratása `racer`
+--
+
+INSERT INTO `racer` (`id`, `team_id`, `name`) VALUES
+('1', '1', 'leventenyiro'),
+('2', '1', 'TUSZMUSZ'),
+('3', '2', 'MorzsamanKing');
 
 -- --------------------------------------------------------
 
@@ -47,8 +46,15 @@ CREATE TABLE `racer` (
 
 CREATE TABLE `season` (
   `id` varchar(200) COLLATE utf8_bin NOT NULL,
-  `name` int(11) NOT NULL
+  `name` varchar(255) COLLATE utf8_bin NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--
+-- A tábla adatainak kiíratása `season`
+--
+
+INSERT INTO `season` (`id`, `name`) VALUES
+('1', 'Formula 1 - Season 1');
 
 -- --------------------------------------------------------
 
@@ -62,6 +68,14 @@ CREATE TABLE `season_track` (
   `track_id` varchar(200) COLLATE utf8_bin NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
+--
+-- A tábla adatainak kiíratása `season_track`
+--
+
+INSERT INTO `season_track` (`id`, `season_id`, `track_id`) VALUES
+('1', '1', '1'),
+('2', '1', '2');
+
 -- --------------------------------------------------------
 
 --
@@ -72,8 +86,39 @@ CREATE TABLE `season_track_racer` (
   `id` varchar(200) COLLATE utf8_bin NOT NULL,
   `season_track_id` varchar(200) COLLATE utf8_bin NOT NULL,
   `racer_id` varchar(200) COLLATE utf8_bin NOT NULL,
-  `position` int(11) NOT NULL
+  `position` varchar(255) COLLATE utf8_bin NOT NULL,
+  `point` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--
+-- A tábla adatainak kiíratása `season_track_racer`
+--
+
+INSERT INTO `season_track_racer` (`id`, `season_track_id`, `racer_id`, `position`, `point`) VALUES
+('1', '1', '1', '1', 25),
+('2', '1', '2', '2', 18),
+('3', '1', '3', '3', 15),
+('4', '2', '1', '2', 18),
+('5', '2', '2', '3', 15);
+
+-- --------------------------------------------------------
+
+--
+-- Tábla szerkezet ehhez a táblához `team`
+--
+
+CREATE TABLE `team` (
+  `id` varchar(200) COLLATE utf8_bin NOT NULL,
+  `name` varchar(255) COLLATE utf8_bin NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--
+-- A tábla adatainak kiíratása `team`
+--
+
+INSERT INTO `team` (`id`, `name`) VALUES
+('2', 'Ferrari'),
+('1', 'Mercedes-AMG');
 
 -- --------------------------------------------------------
 
@@ -87,6 +132,33 @@ CREATE TABLE `track` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 --
+-- A tábla adatainak kiíratása `track`
+--
+
+INSERT INTO `track` (`id`, `name`) VALUES
+('1', 'Australia'),
+('2', 'Bahrein');
+
+-- --------------------------------------------------------
+
+--
+-- Tábla szerkezet ehhez a táblához `user`
+--
+
+CREATE TABLE `user` (
+  `id` varchar(200) COLLATE utf8_bin NOT NULL,
+  `username` varchar(255) COLLATE utf8_bin NOT NULL,
+  `password` varchar(255) COLLATE utf8_bin NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--
+-- A tábla adatainak kiíratása `user`
+--
+
+INSERT INTO `user` (`id`, `username`, `password`) VALUES
+('18b040e387', 'admin', '$2b$10$xgbmCgkaNqe7S4BgakDW5.oK5Jk4Zt20a7LudRTQHEMxU5lIDBL6i');
+
+--
 -- Indexek a kiírt táblákhoz
 --
 
@@ -94,7 +166,8 @@ CREATE TABLE `track` (
 -- A tábla indexei `racer`
 --
 ALTER TABLE `racer`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `team_id` (`team_id`);
 
 --
 -- A tábla indexei `season`
@@ -119,14 +192,34 @@ ALTER TABLE `season_track_racer`
   ADD KEY `racer_id` (`racer_id`);
 
 --
+-- A tábla indexei `team`
+--
+ALTER TABLE `team`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uc_name` (`name`);
+
+--
 -- A tábla indexei `track`
 --
 ALTER TABLE `track`
   ADD PRIMARY KEY (`id`);
 
 --
+-- A tábla indexei `user`
+--
+ALTER TABLE `user`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uc_username` (`username`);
+
+--
 -- Megkötések a kiírt táblákhoz
 --
+
+--
+-- Megkötések a táblához `racer`
+--
+ALTER TABLE `racer`
+  ADD CONSTRAINT `racer_ibfk_1` FOREIGN KEY (`team_id`) REFERENCES `team` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Megkötések a táblához `season_track`

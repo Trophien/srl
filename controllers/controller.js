@@ -28,10 +28,56 @@ exports.login = (req, res) => {
     }
 }
 
+exports.session = (req, res) => {
+    if (req.session.userId == undefined)
+        res.json({ error: "" })
+    res.json({ success: "" })
+}
+
 exports.logout = (req, res) => {
     req.session.destroy((err) => {
         if (err) throw err
         res.clearCookie("session")
         res.end()
     })
+}
+
+// táblázatok
+
+exports.getAllSeason = (req, res) => {
+    var db = new Database()
+    db.getAllSeason(req, (result) => {
+        res.send(result)
+        db.end()
+    })
+}
+
+exports.getRacerPoint = (req, res) => {
+    var db = new Database()
+    db.getRacerPoint(req, (result) => {
+        res.send(result)
+        db.end()
+    })
+}
+
+exports.getTeamPoint = (req, res) => {
+    var db = new Database()
+    db.getTeamPoint(req, (result) => {
+        res.send(result)
+        db.end()
+    })
+}
+
+// admin
+
+exports.modifySeason = (req, res) => {
+    if (req.body.name == "")
+        res.json({ error: "A mező nincs kitöltve!" })
+    else {
+        var db = new Database()
+        db.modifySeason(req)
+        res.json({ success: "" })
+        db.end()
+    }
+    db.modifySession(req)
 }

@@ -1,6 +1,6 @@
 this.url = "http://localhost:3001/"
 
-function login() {
+async function login() {
     var username = document.getElementById("inputUsername").value
     var password = document.getElementById("inputPassword").value
 
@@ -20,10 +20,26 @@ function login() {
     }
 }
 
-function logout() {
+async function logout() {
     await fetch(`${this.url}logout`, {
         method: "POST",
         credentials: "include"
     })
     window.location = "index.html"
+}
+
+async function getAllSeason() {
+    var res = await fetch(`${this.url}season`, {
+        method: "GET"
+    }).then(res => res.json())
+    var x = ""
+    if (res.length > 0) {
+        res.forEach(i=> {
+            x += `
+            <option value="${i.id}">${i.name}</option>
+            `
+        })
+    }
+    console.log(x)
+    document.getElementById("selectOptionSeason").innerHTML += x
 }
