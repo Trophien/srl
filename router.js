@@ -17,6 +17,9 @@ router.post("/racerpoint", controller.getRacerPoint)
 router.post("/teampoint", controller.getTeamPoint)
 
 // admin
+router.post("/season", controller.addSeason)
 router.put("/season", controller.modifySeason)
+router.put("/seasonarchived", controller.modifySeasonArchived)
+router.delete("/season", controller.deleteSeason)
 
 module.exports = router

@@ -29,9 +29,10 @@ exports.login = (req, res) => {
 }
 
 exports.session = (req, res) => {
-    if (req.session.userId == undefined)
+    if (req.session.userId == null)
         res.json({ error: "" })
-    res.json({ success: "" })
+    else
+        res.json({ success: "" })
 }
 
 exports.logout = (req, res) => {
@@ -70,14 +71,85 @@ exports.getTeamPoint = (req, res) => {
 
 // admin
 
-exports.modifySeason = (req, res) => {
-    if (req.body.name == "")
+function passwordValidate(req) {
+    var db = new Database()
+    var bcrypt = new Bcrypt()
+    db.passwordValidate(req, (result) => {
+        bcrypt.decrypt(req.body.password, result[0].password, (hash) => {
+            if (hash) {
+                console.log("Jó")
+                db.end()
+                return 1
+            } else {
+                console.log("rossz")
+                db.end()
+                return 0
+            }
+        })
+    })
+}
+
+exports.addSeason = (req, res) => {
+    if (req.session.userId == null)
+        res.end()
+    else {
+        if (req.body.name == "")
         res.json({ error: "A mező nincs kitöltve!" })
+        else {
+            var db = new Database()
+            db.addSeason(req, (result) => {
+                res.json(result)
+                db.end()
+            })
+        }
+    }
+}
+
+exports.modifySeason = (req, res) => {
+    if (req.session.userId == null)
+        res.end()
+    else {
+        if (req.body.name == "")
+        res.json({ error: "A mező nincs kitöltve!" })
+        else {
+            var db = new Database()
+            db.modifySeason(req, (result) => {
+                res.json(result)
+                db.end()
+            })
+        }
+    }
+}
+
+exports.modifySeasonArchived = (req, res) => {
+    if (req.session.userId == null)
+        res.end()
     else {
         var db = new Database()
-        db.modifySeason(req)
-        res.json({ success: "" })
+        db.modifySeasonArchived(req)
         db.end()
+        res.json({ success: "Sikeres módosítás!" })
     }
-    db.modifySession(req)
 }
+
+exports.deleteSeason = (req, res) => {
+    if (req.session.userId == null)
+        res.end()
+    else {
+        var db = new Database()
+        var bcrypt = new Bcrypt()
+        db.passwordValidate(req, (result) => {
+                bcrypt.decrypt(req.body.password, result[0].password, (hash) => {
+                if (hash) {
+                    db.deleteSeason(req)
+                    res.json({ success: "Sikeres művelet!" })
+                    db.end()
+                } else {
+                    res.json({ error: "Sikertelen művelet!" })
+                    db.end()
+                }
+            })
+        })
+    }
+}
+

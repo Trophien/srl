@@ -1,0 +1,14 @@
+.error-modal-content {
+  background-color: #FFE8E8 !important;
+  border-radius: 15px !important;
+}
+
+.success-modal-content {
+  background-color: #BDF8BD !important;
+  border-radius: 15px !important;
+}
+
+td {
+  text-align: center;
+}
+/*# sourceMappingURL=main.css.map */

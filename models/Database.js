@@ -11,6 +11,13 @@ class Database {
         this.hashedId = ""
     }
 
+    passwordValidate(req, callback) {
+        var sql = `SELECT password FROM user WHERE id = "${req.session.userId}"`
+        this.conn.query(sql, (err, result) => {
+            return callback(result)
+        })
+    }
+
     login(req, callback) {
         var sql = `SELECT id, password FROM user WHERE username = "${req.body.username}"`
         this.conn.query(sql, (err, result) => {
@@ -68,8 +75,32 @@ class Database {
     }
     
     // admin
-    modifySeason(req) {
+    addSeason(req, callback) {
+        this.generateNewHashedId(`season`)
+        var sql = `INSERT INTO season (id, name) VALUES("${this.hashedId}", "${req.body.name}")`
+        this.conn.query(sql, (err) => {
+            if (err)
+                return callback({ error: "Ez a szezon már létezik! "})
+            return callback({ success: "Sikeres művelet!" })
+        })
+    }
+
+    modifySeason(req, callback) {
         var sql = `UPDATE season SET name = "${req.body.name}" WHERE id = "${req.body.id}"`
+        this.conn.query(sql, (err) => {
+            if (err)
+                return callback({ error: "Ez a szezon már létezik! "})
+            return callback({ success: "Sikeres művelet!" })
+        })
+    }
+
+    modifySeasonArchived(req) {
+        var sql = `UPDATE season SET archived = ${req.body.archived} WHERE id = "${req.body.id}"`
+        this.conn.query(sql)
+    }
+
+    deleteSeason(req) {
+        var sql = `DELETE FROM season WHERE id = "${req.body.id}"`
         this.conn.query(sql)
     }
 
