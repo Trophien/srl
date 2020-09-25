@@ -17,15 +17,17 @@ router.post("/teampoint", controller.getTeamPoint)
 
 // admin
 // season
-router.get("/season", controller.getAllSeason)
-router.post("/season", controller.addSeason)
-router.put("/season", controller.modifySeason)
-router.put("/seasonarchived", controller.modifySeasonArchived)
-router.delete("/season", controller.deleteSeason)
+router.get("/admin/season", controller.getAllSeason)
+router.get("/admin/season/:id", controller.getOneSeason)
+router.post("/admin/season", controller.addSeason)
+router.put("/admin/season/:id", controller.modifySeason)
+router.put("/admin/seasonarchived/:id", controller.modifySeasonArchived)
+router.delete("/admin/season/:id", controller.deleteSeason)
 //track
-router.get("/track/:seasonId", controller.getAllTrack)
-router.post("/track", controller.addTrack)
-router.put("/track", controller.modifyTrack)
-router.delete("/track", controller.deleteTrack)
+router.get("/admin/track/:seasonId", controller.getAllTrack)
+router.get("/admin/track/one/:id", controller.getOneTrack)
+router.post("/admin/track", controller.addTrack)
+router.put("/admin/track/:id", controller.modifyTrack)
+router.delete("/admin/track/:id", controller.deleteTrack)
 
 module.exports = router

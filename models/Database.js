@@ -34,13 +34,6 @@ class Database {
         })
     }
 
-    getAllSeason(req, callback) {
-        var sql = `SELECT * FROM season`
-        this.conn.query(sql, (err, result) => {
-            return callback(result)
-        })
-    }
-
     getNotArchivedSeason(req, callback) {
         var sql = `SELECT * FROM season WHERE archived = 0`
         this.conn.query(sql, (err, result) => {
@@ -82,6 +75,20 @@ class Database {
     }
     
     // admin
+    getAllSeason(req, callback) {
+        var sql = `SELECT * FROM season`
+        this.conn.query(sql, (err, result) => {
+            return callback(result)
+        })
+    }
+
+    getOneSeason(req, callback) {
+        var sql = `SELECT * FROM season WHERE id = "${req.params.id}"`
+        this.conn.query(sql, (err, result) => {
+            return callback(result[0])
+        })
+    }
+
     addSeason(req, callback) {
         this.generateNewHashedId(`season`)
         var sql = `INSERT INTO season (id, name) VALUES ("${this.hashedId}", "${req.body.name}")`
@@ -93,7 +100,7 @@ class Database {
     }
 
     modifySeason(req, callback) {
-        var sql = `UPDATE season SET name = "${req.body.name}" WHERE id = "${req.body.id}"`
+        var sql = `UPDATE season SET name = "${req.body.name}" WHERE id = "${req.params.id}"`
         this.conn.query(sql, (err) => {
             if (err)
                 return callback({ error: "Ez a szezon már létezik!" })
@@ -102,12 +109,12 @@ class Database {
     }
 
     modifySeasonArchived(req) {
-        var sql = `UPDATE season SET archived = ${req.body.archived} WHERE id = "${req.body.id}"`
+        var sql = `UPDATE season SET archived = ${req.body.archived} WHERE id = "${req.params.id}"`
         this.conn.query(sql)
     }
 
     deleteSeason(req) {
-        var sql = `DELETE FROM season WHERE id = "${req.body.id}"`
+        var sql = `DELETE FROM season WHERE id = "${req.params.id}"`
         this.conn.query(sql)
     }
 
@@ -120,9 +127,16 @@ class Database {
         })
     }
 
+    getOneTrack(req, callback) {
+        var sql = `SELECT * FROM season_track WHERE id = "${req.params.id}"`
+        this.conn.query(sql, (err, result) => {
+            return callback(result[0])
+        })
+    }
+
     addTrack(req, callback) {
         this.generateNewHashedId(`season_track`)
-        var sql = `INSERT INTO season_track (id, season_id, code, name) VALUES ("${this.hashedId}", "${req.body.seasonId}", "${req.body.code}", "${req.body.name}")`
+        var sql = `INSERT INTO season_track (id, season_id, number, code, name) VALUES ("${this.hashedId}", "${req.body.seasonId}", ${req.body.number},"${req.body.code}", "${req.body.name}")`
         this.conn.query(sql, (err) => {
             if (err)
                 return callback({ error: "Az adatoknak egyedieknek kell lenniük!" })
@@ -131,7 +145,7 @@ class Database {
     }
 
     modifyTrack(req, callback) {
-        var sql = `UPDATE season_track SET code = "${req.body.code}", name = "${req.body.name}" WHERE id = "${req.body.id}"`
+        var sql = `UPDATE season_track SET number = "${req.body.number}", code = "${req.body.code}", name = "${req.body.name}" WHERE id = "${req.params.id}"`
         this.conn.query(sql, (err) => {
             if (err)
                 return callback({ error: "Az adatoknak egyedieknek kell lenniük!" })
@@ -139,8 +153,8 @@ class Database {
         })
     }
 
-    deleteSeason(req) {
-        var sql = `DELETE FROM season_track WHERE id = "${req.body.id}"`
+    deleteTrack(req) {
+        var sql = `DELETE FROM season_track WHERE id = "${req.params.id}"`
         this.conn.query(sql)
     }
 

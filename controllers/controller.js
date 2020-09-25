@@ -71,7 +71,7 @@ exports.getTeamPoint = (req, res) => {
 
 // admin
 
-function passwordValidate(req) {
+/*function passwordValidate(req) {
     var db = new Database()
     var bcrypt = new Bcrypt()
     db.passwordValidate(req, (result) => {
@@ -85,11 +85,19 @@ function passwordValidate(req) {
             }
         })
     })
-}
+}*/
 
 exports.getAllSeason = (req, res) => {
     var db = new Database()
     db.getAllSeason(req, (result) => {
+        res.send(result)
+        db.end()
+    })
+}
+
+exports.getOneSeason = (req, res) => {
+    var db = new Database()
+    db.getOneSeason(req, (result) => {
         res.send(result)
         db.end()
     })
@@ -145,7 +153,7 @@ exports.deleteSeason = (req, res) => {
         var db = new Database()
         var bcrypt = new Bcrypt()
         db.passwordValidate(req, (result) => {
-                bcrypt.decrypt(req.body.password, result[0].password, (hash) => {
+            bcrypt.decrypt(req.body.password, result[0].password, (hash) => {
                 if (hash) {
                     db.deleteSeason(req)
                     res.json({ success: "Sikeres művelet!" })
@@ -169,12 +177,20 @@ exports.getAllTrack = (req, res) => {
     })
 }
 
+exports.getOneTrack = (req, res) => {
+    var db = new Database()
+    db.getOneTrack(req, (result) => {
+        res.send(result)
+        db.end()
+    })
+}
+
 exports.addTrack = (req, res) => {
     if (req.session.userId == null)
         res.end()
     else {
         if (req.body.name == "" || req.body.code == "" || req.body.number == "")
-            res.json({ error: "A mező nincs kitöltve!" })
+        res.json({ error: "Valami nincs kitöltve!" })
         else {
             var db = new Database()
             db.addTrack(req, (result) => {
@@ -190,7 +206,7 @@ exports.modifyTrack = (req, res) => {
         res.end()
     else {
         if (req.body.name == "" || req.body.code == "" || req.body.number == "")
-        res.json({ error: "A mező nincs kitöltve!" })
+            res.json({ error: "Valami nincs kitöltve!" })
         else {
             var db = new Database()
             db.modifyTrack(req, (result) => {
