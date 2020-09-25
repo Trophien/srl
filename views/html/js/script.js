@@ -42,12 +42,10 @@ async function login() {
         credentials: "include",
         body: JSON.stringify({ username: username, password: password })
     }).then(response => response.json())
-    if ("error" in response) {
-        //this.response(response)
+    if ("error" in response)
         document.getElementById("inputPassword").value = ""
-    } else if ("success" in response) {
+    else if ("success" in response)
         window.location = "adminseason.html"
-    }
 }
 
 function showPassword() {
@@ -57,13 +55,18 @@ function hidePassword() {
     document.getElementById("inputPassword").type = "password"
 }
 
-async function session() {
+async function session(url) {
     var res = await fetch(`${this.url}session`, {
         method: "GET",
         credentials: "include"
     }).then(res => res.json())
-    if ("error" in res)
-        window.location = "index.html"
+    if ("error" in res) {
+        if (url == "index.html")
+            window.location = url
+        else if (url == "login.html")
+            window.location = url
+    } else if (url == "login.html")
+        window.location = "adminseason.html"
 }
 
 async function logout() {
@@ -75,7 +78,7 @@ async function logout() {
 }
 
 async function getAllSeasonSelectOption() {
-    var res = await fetch(`${this.url}season`, {
+    var res = await fetch(`${this.url}seasonnotarchived`, {
         method: "GET"
     }).then(res => res.json())
     var x = ""
@@ -288,4 +291,48 @@ async function deleteSeason(id) {
     }).then(res => res.json())
     setTimeout(getAllSeasonAdmin(), 500)
     this.response(res)
+}
+
+// track
+
+async function getAllTrack() {
+    var seasonId = document.getElementById("selectOptionSeason").value
+    document.getElementById("adminTrack").innerHTML = ""
+    var res = await fetch(`${this.url}track/${seasonId}`, {
+        method: "GET"
+    }).then(res => res.json())
+    var x = ""
+    if (res.length > 0) {
+        res.forEach(i => {
+            x += `
+            <tr>
+                <td>
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="inputName${i.id}" value="${i.name}" disabled>
+                    </div>
+                </td>
+                <td>
+                    <select class="form-control" id="inputArchived${i.id}" onchange="modifyArchived('${i.id}')">`
+                    if (i.archived == 1) {
+                        x += `
+                        <option value="1" selected>Igen</option>
+                        <option value="0">Nem</option>`
+                    } else {
+                        x += `
+                        <option value="1">Igen</option>
+                        <option value="0" selected>Nem</option>`
+                    }
+                    x += `</select>
+                </td>
+                <td>
+                    <button class="btn btn-warning" onclick="modifySeason('${i.id}', 'inputName${i.id}')">Módosítás</button>
+                    <button class="btn btn-danger" onclick="deleteSeasonForm('${i.id}')">Törlés</button>
+                </td>
+            </tr>
+            `
+        })
+    } else {
+        x += `<tr><td colspan="3">Még nincs szezon</td></tr>`
+    }
+    document.getElementById("adminTrack").innerHTML += x
 }

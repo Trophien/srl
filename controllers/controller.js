@@ -3,13 +3,13 @@ var Bcrypt = require("../models/Bcrypt")
 
 exports.login = (req, res) => {
     if (req.body.username == "" || req.body.password == "")
-        res.json({ error: "Something is missing!" })
+        res.json({ error: "Valami nincs kitöltve!" })
     else {
         var db = new Database()
         var bcrypt = new Bcrypt()
         db.login(req, (result) => {
             if (result.length == 0) {
-                res.json({ error: "Login is unsuccessful" })
+                res.json({ error: "Sikertelen bejelentkezés!" })
                 db.end()
             } else {
                 bcrypt.decrypt(req.body.password, result[0].password, (hash) => {
@@ -19,7 +19,7 @@ exports.login = (req, res) => {
                         db.end()
                     } else {
                         res.statusCode = 401
-                        res.json({ error: "Login is unsuccessful" })
+                        res.json({ error: "Sikertelen bejelentkezés!" })
                         db.end()
                     }
                 })
@@ -45,9 +45,9 @@ exports.logout = (req, res) => {
 
 // táblázatok
 
-exports.getAllSeason = (req, res) => {
+exports.getNotArchivedSeason = (req, res) => {
     var db = new Database()
-    db.getAllSeason(req, (result) => {
+    db.getNotArchivedSeason(req, (result) => {
         res.send(result)
         db.end()
     })
@@ -77,15 +77,21 @@ function passwordValidate(req) {
     db.passwordValidate(req, (result) => {
         bcrypt.decrypt(req.body.password, result[0].password, (hash) => {
             if (hash) {
-                console.log("Jó")
                 db.end()
                 return 1
             } else {
-                console.log("rossz")
                 db.end()
                 return 0
             }
         })
+    })
+}
+
+exports.getAllSeason = (req, res) => {
+    var db = new Database()
+    db.getAllSeason(req, (result) => {
+        res.send(result)
+        db.end()
     })
 }
 
@@ -94,7 +100,7 @@ exports.addSeason = (req, res) => {
         res.end()
     else {
         if (req.body.name == "")
-        res.json({ error: "A mező nincs kitöltve!" })
+            res.json({ error: "A mező nincs kitöltve!" })
         else {
             var db = new Database()
             db.addSeason(req, (result) => {
@@ -153,3 +159,65 @@ exports.deleteSeason = (req, res) => {
     }
 }
 
+// tracks
+
+exports.getAllTrack = (req, res) => {
+    var db = new Database()
+    db.getAllTrack(req, (result) => {
+        res.send(result)
+        db.end()
+    })
+}
+
+exports.addTrack = (req, res) => {
+    if (req.session.userId == null)
+        res.end()
+    else {
+        if (req.body.name == "" || req.body.code == "" || req.body.number == "")
+            res.json({ error: "A mező nincs kitöltve!" })
+        else {
+            var db = new Database()
+            db.addTrack(req, (result) => {
+                res.json(result)
+                db.end()
+            })
+        }
+    }
+}
+
+exports.modifyTrack = (req, res) => {
+    if (req.session.userId == null)
+        res.end()
+    else {
+        if (req.body.name == "" || req.body.code == "" || req.body.number == "")
+        res.json({ error: "A mező nincs kitöltve!" })
+        else {
+            var db = new Database()
+            db.modifyTrack(req, (result) => {
+                res.json(result)
+                db.end()
+            })
+        }
+    }
+}
+
+exports.deleteTrack = (req, res) => {
+    if (req.session.userId == null)
+        res.end()
+    else {
+        var db = new Database()
+        var bcrypt = new Bcrypt()
+        db.passwordValidate(req, (result) => {
+                bcrypt.decrypt(req.body.password, result[0].password, (hash) => {
+                if (hash) {
+                    db.deleteTrack(req)
+                    res.json({ success: "Sikeres művelet!" })
+                    db.end()
+                } else {
+                    res.json({ error: "Sikertelen művelet!" })
+                    db.end()
+                }
+            })
+        })
+    }
+}

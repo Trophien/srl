@@ -1,6 +1,7 @@
 {
     "app": {
-        "port": 3001
+        "port": 3001,
+        "pw": "SlipstreamRacingLeague"
     },
     "db": {
         "host": "localhost",
