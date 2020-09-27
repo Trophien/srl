@@ -45,7 +45,7 @@ async function login() {
     if ("error" in response)
         document.getElementById("inputPassword").value = ""
     else if ("success" in response)
-        window.location = "adminseason.html"
+        window.location = "./admin/season.html"
 }
 
 function showPassword() {
@@ -61,12 +61,12 @@ async function session(url) {
         credentials: "include"
     }).then(res => res.json())
     if ("error" in res) {
-        if (url == "index.html")
+        if (url == "../index.html")
             window.location = url
         else if (url == "login.html")
             window.location = url
     } else if (url == "login.html")
-        window.location = "adminseason.html"
+        window.location = "./admin/season.html"
 }
 
 async function logout() {
@@ -74,7 +74,7 @@ async function logout() {
         method: "POST",
         credentials: "include"
     })
-    window.location = "index.html"
+    window.location = "../index.html"
 }
 
 async function getAllSeasonSelectOption() {
@@ -149,7 +149,7 @@ async function getPoints() {
 
 // admin
 async function getAllSeasonAdmin() {
-    document.getElementById("adminSeason").innerHTML = ""
+    document.getElementById("tbody").innerHTML = ""
     var res = await fetch(`${this.url}admin/season`, {
         method: "GET"
     }).then(res => res.json())
@@ -183,7 +183,7 @@ async function getAllSeasonAdmin() {
     } else {
         x += `<tr><td colspan="3">Még nincs szezon felvéve.</td></tr>`
     }
-    document.getElementById("adminSeason").innerHTML += x
+    document.getElementById("tbody").innerHTML += x
 }
 
 async function addSeason() {
@@ -195,34 +195,16 @@ async function addSeason() {
         },
         body: JSON.stringify({ name: document.getElementById("inputName").value })
     }).then(res => res.json())
-    setTimeout(getAllSeasonAdmin(), 500)
     this.response(res)
-    if (`success` in res)
+    if (`success` in res) {
         document.getElementById("inputName").value = ""
-
-}
-
-/*async function modifySeason(id) {
-    if (document.getElementById(`inputName${id}`).disabled == true)
-        document.getElementById(`inputName${id}`).disabled = false
-    else {
-        // módosítás
-        var res = await fetch(`${this.url}season`, {
-            method: "PUT",
-            credentials: "include",
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ id: id, name: document.getElementById(`inputName${id}`).value })
-        }).then(res => res.json())
-        this.response(res)
-        if ("success" in res)
-            document.getElementById(`inputName${id}`).disabled = true
-        else
-            getAllSeasonAdmin()
+        setTimeout(getAllSeasonAdmin(), 500)
+    } else { // BS5
+        $(document).ready(function() {
+            $("#insertModal").modal("show")
+        })
     }
 }
-#########################################################################*/
 
 async function modifySeasonForm(id) {
     var res = await fetch(`${this.url}admin/season/${id}`, {
@@ -344,7 +326,10 @@ async function deleteSeason(id) {
         body: JSON.stringify({ password: password })
     }).then(res => res.json())
     this.response(res)
-    setTimeout(getAllSeasonAdmin(), 500)
+    if ("success" in res)
+        setTimeout(getAllSeasonAdmin(), 500)
+    else
+        deleteSeasonForm(id)
 }
 
 // track
@@ -352,7 +337,7 @@ async function deleteSeason(id) {
 async function getAllTrack() {
     document.getElementById("table").classList.remove("hidden")
     var seasonId = document.getElementById("selectOptionSeason").value
-    document.getElementById("adminTrack").innerHTML = ""
+    document.getElementById("tbody").innerHTML = ""
     var res = await fetch(`${this.url}admin/track/${seasonId}`, {
         method: "GET"
     }).then(res => res.json())
@@ -380,7 +365,7 @@ async function getAllTrack() {
     } else {
         x += `<tr><td colspan="4">Még nincs verseny felvéve.</td></tr>`
     }
-    document.getElementById("adminTrack").innerHTML += x
+    document.getElementById("tbody").innerHTML += x
 }
 
 async function addTrack() {
@@ -397,12 +382,16 @@ async function addTrack() {
             name: document.getElementById("inputName").value
         })
     }).then(res => res.json())
-    setTimeout(getAllTrack(), 500)
     this.response(res)
     if ("success" in res) {
         document.getElementById("inputNumber").value = ""
         document.getElementById("inputCode").value = ""
         document.getElementById("inputName").value = ""
+        setTimeout(getAllTrack(), 500)
+    } else {
+        $(document).ready(function() {
+            $("#insertModal").modal("show")
+        })
     }
 }
 
@@ -529,4 +518,413 @@ async function deleteTrack(id) {
     this.response(res)
     if ("success" in res)
         setTimeout(getAllTrack(), 500)
+    else
+        deleteTrackForm(id)
 }
+
+// team
+
+async function getAllTeam() {
+    document.getElementById("table").classList.remove("hidden")
+    var seasonId = document.getElementById("selectOptionSeason").value
+    document.getElementById("tbody").innerHTML = ""
+    var res = await fetch(`${this.url}admin/team/${seasonId}`, {
+        method: "GET"
+    }).then(res => res.json())
+    var x = ""
+    if (res.length > 0) {
+        res.forEach(i => {
+            x += `
+            <tr>
+                <td>
+                    <p>${i.name}</p>
+                </td>
+                <td style="background-color: ${i.color}"></td>
+                <td>
+                    <button class="btn btn-warning" onclick="modifyTeamForm('${i.id}')">Módosítás</button>
+                    <button class="btn btn-danger" onclick="deleteTeamForm('${i.id}')">Törlés</button>
+                </td>
+            </tr>
+            `
+        })
+    } else {
+        x += `<tr><td colspan="3">Még nincs csapat felvéve.</td></tr>`
+    }
+    document.getElementById("tbody").innerHTML += x
+}
+
+async function addTeam() {
+    var res = await fetch(`${this.url}admin/team`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            seasonId: document.getElementById("selectOptionSeason").value,
+            name: document.getElementById("inputName").value,
+            color: document.getElementById("inputColor").value
+        })
+    }).then(res => res.json())
+    this.response(res)
+    if ("success" in res) {
+        document.getElementById("inputName").value = ""
+        document.getElementById("inputColor").value = "#000000"
+        setTimeout(getAllTeam(), 500)
+    } else {
+        $(document).ready(function() {
+            $("#insertModal").modal("show")
+        })
+    }
+}
+
+async function modifyTeamForm(id) {
+    var res = await fetch(`${this.url}admin/team/one/${id}`, {
+        method: "GET"
+    }).then(res => res.json())
+    document.getElementById("modifyForm").innerHTML = ""
+    x = `
+    <div class="modal fade" id="modifyModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Módosítás</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div style="padding: 2%; margin:auto">
+                        <div class="form-group">
+                            <label class="d-block-inline">Szín:</label>
+                            <input class="form-control d-block-inline" type="color" id="inputModifyColor" value="${res.color}">
+                        </div>
+                        <div class="form-group">
+                            <input class="form-control" type="text" id="inputModifyName" placeholder="Név" value="${res.name}">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" data-dismiss="modal" onclick="modifyTeam('${id}')">Módosítás</button>
+                </div>
+            </div>
+        </div>
+    </div>`
+    // jQuery-t ki kell váltani - BS5
+    document.getElementById("modifyForm").innerHTML = x
+    $(document).ready(function() {
+        $("#modifyModal").modal("show")
+    })
+}
+
+async function modifyTeam(id) {
+    var res = await fetch(`${this.url}admin/team/${id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            name: document.getElementById("inputModifyName").value,
+            color: document.getElementById("inputModifyColor").value
+        })
+    }).then(res => res.json())
+    this.response(res)
+    if ("success" in res) {
+        document.getElementById("inputModifyName").value = ""
+        document.getElementById("inputModifyColor").value = "#000000"
+        setTimeout(getAllTeam(), 500)
+    } else
+        modifyTeamForm(id)
+}
+
+async function deleteTeamForm(id) {
+    var x = ""
+    x = `
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Írd be a jelszavad a törléshez!</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div style="padding: 2%; margin:auto">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="inputPassword" placeholder="Jelszó">
+                                <div class="input-group-append">
+                                    <button class="btn btn-secondary" onmousedown="showPassword()" onmouseup="hidePassword()">
+                                        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-eye" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd" d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.134 13.134 0 0 0 1.66 2.043C4.12 11.332 5.88 12.5 8 12.5c2.12 0 3.879-1.168 5.168-2.457A13.134 13.134 0 0 0 14.828 8a13.133 13.133 0 0 0-1.66-2.043C11.879 4.668 10.119 3.5 8 3.5c-2.12 0-3.879 1.168-5.168 2.457A13.133 13.133 0 0 0 1.172 8z"/>
+                                            <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        <small id="emailHelp" class="form-text text-muted">Ez a folyamat visszavonhatatlan lesz.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-danger" data-dismiss="modal" onclick="deleteTeam('${id}')">Törlés</button>
+                </div>
+            </div>
+        </div>
+    </div>`
+    // jQuery-t ki kell váltani - BS5
+    document.getElementById("deleteForm").innerHTML = x
+    $(document).ready(function() {
+        $("#deleteModal").modal("show")
+    })
+}
+
+async function deleteTeam(id) {
+    var password = document.getElementById("inputPassword").value
+    var res = await fetch(`${this.url}admin/team/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ password: password })
+    }).then(res => res.json())
+    this.response(res)
+    if ("success" in res)
+        setTimeout(getAllTeam(), 500)
+    else
+        deleteTeamForm(id)
+}
+
+// racer
+
+async function getAllRacer() {
+    document.getElementById("table").classList.remove("hidden")
+    var seasonId = document.getElementById("selectOptionSeason").value
+    document.getElementById("tbody").innerHTML = ""
+    var res = await fetch(`${this.url}admin/racer/${seasonId}`, {
+        method: "GET"
+    }).then(res => res.json())
+    var x = ""
+    if (res.length > 0) {
+        res.forEach(i => {
+            x += `
+            <tr>
+                <td>
+                    <p>${i.rname}</p>
+                </td>
+                <td>
+                    <p>${i.tname}</p>
+                </td>
+                <td>
+                    <button class="btn btn-warning" onclick="modifyRacerForm('${i.rid}')">Módosítás</button>
+                    <button class="btn btn-danger" onclick="deleteRacerForm('${i.rid}')">Törlés</button>
+                </td>
+            </tr>
+            `
+        })
+    } else {
+        x += `<tr><td colspan="3">Még nincs versenyző felvéve.</td></tr>`
+    }
+    document.getElementById("tbody").innerHTML += x
+}
+
+async function getAllTeamSelectOption() {
+    var seasonId = document.getElementById("selectOptionSeason").value
+    var res = await fetch(`${this.url}admin/team/${seasonId}`, {
+        method: "GET"
+    }).then(res => res.json())
+    document.getElementById("selectOptionTeam").innerHTML = ""
+    var x = "<option disabled selected>Válassz csapatot...</option>"
+    if (res.length > 0) {
+        res.forEach(i => {
+            x += `
+            <option value="${i.id}">${i.name}</option>`
+        })
+    }
+    document.getElementById("selectOptionTeam").innerHTML += x
+}
+
+async function addRacer() {
+    var res = await fetch(`${this.url}admin/racer`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            seasonId: document.getElementById("selectOptionSeason").value,
+            name: document.getElementById("inputName").value,
+            teamId: document.getElementById("selectOptionTeam").value
+        })
+    }).then(res => res.json())
+    this.response(res)
+    if ("success" in res) {
+        document.getElementById("inputName").value = ""
+        setTimeout(getAllRacer(), 500)
+    } else {
+        $(document).ready(function() {
+            $("#insertModal").modal("show")
+        })
+    }
+}
+
+async function getAllTeamSelectOptionModify(teamId) {
+    var seasonId = document.getElementById("selectOptionSeason").value
+    var res = await fetch(`${this.url}admin/team/${seasonId}`, {
+        method: "GET"
+    }).then(res => res.json())
+    var x = "<option disabled>Válassz csapatot...</option>"
+    if (res.length > 0) {
+        res.forEach(i => {
+            if (i.id == teamId)
+                x += `<option value="${i.id}" selected>${i.name}</option>`
+            else
+                x += `<option value="${i.id}">${i.name}</option>`
+        })
+    }
+    document.getElementById("selectOptionModifyTeam").innerHTML += x
+}
+
+async function modifyRacerForm(id) {
+    var res = await fetch(`${this.url}admin/racer/one/${id}`, {
+        method: "GET"
+    }).then(res => res.json())
+    getAllTeamSelectOptionModify(res.tid)
+    document.getElementById("modifyForm").innerHTML = ""
+    x = `
+    <div class="modal fade" id="modifyModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Módosítás</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div style="padding: 2%; margin:auto">
+                        <div class="form-group">
+                            <input class="form-control" type="text" id="inputModifyName" placeholder="Név" value="${res.rname}">
+                        </div>
+                        <div class="form-group">
+                            <select class="form-control" id="selectOptionModifyTeam">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" data-dismiss="modal" onclick="modifyRacer('${id}')">Módosítás</button>
+                </div>
+            </div>
+        </div>
+    </div>`
+    // jQuery-t ki kell váltani - BS5
+    document.getElementById("modifyForm").innerHTML = x
+    $(document).ready(function() {
+        $("#modifyModal").modal("show")
+    })
+}
+
+async function modifyRacer(id) {
+    var res = await fetch(`${this.url}admin/racer/${id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            name: document.getElementById("inputModifyName").value,
+            teamId: document.getElementById("selectOptionModifyTeam").value
+        })
+    }).then(res => res.json())
+    this.response(res)
+    if ("success" in res) {
+        document.getElementById("inputModifyName").value = ""
+        setTimeout(getAllRacer(), 500)
+    } else
+        modifyRacerForm(id)
+}
+
+async function deleteRacerForm(id) {
+    var x = ""
+    x = `
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Írd be a jelszavad a törléshez!</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div style="padding: 2%; margin:auto">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="inputPassword" placeholder="Jelszó">
+                                <div class="input-group-append">
+                                    <button class="btn btn-secondary" onmousedown="showPassword()" onmouseup="hidePassword()">
+                                        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-eye" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd" d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.134 13.134 0 0 0 1.66 2.043C4.12 11.332 5.88 12.5 8 12.5c2.12 0 3.879-1.168 5.168-2.457A13.134 13.134 0 0 0 14.828 8a13.133 13.133 0 0 0-1.66-2.043C11.879 4.668 10.119 3.5 8 3.5c-2.12 0-3.879 1.168-5.168 2.457A13.133 13.133 0 0 0 1.172 8z"/>
+                                            <path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        <small id="emailHelp" class="form-text text-muted">Ez a folyamat visszavonhatatlan lesz.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-danger" data-dismiss="modal" onclick="deleteRacer('${id}')">Törlés</button>
+                </div>
+            </div>
+        </div>
+    </div>`
+    // jQuery-t ki kell váltani - BS5
+    document.getElementById("deleteForm").innerHTML = x
+    $(document).ready(function() {
+        $("#deleteModal").modal("show")
+    })
+}
+
+async function deleteRacer(id) {
+    var password = document.getElementById("inputPassword").value
+    var res = await fetch(`${this.url}admin/racer/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ password: password })
+    }).then(res => res.json())
+    this.response(res)
+    if ("success" in res)
+        setTimeout(getAllRacer(), 500)
+    else
+        deleteTeamForm(id)
+}
+
+// point
+
+async function getAllTrackSelectOption() {
+    var seasonId = document.getElementById("selectOptionSeason").value
+    var res = await fetch(`${this.url}admin/track/${seasonId}`, {
+        method: "GET"
+    }).then(res => res.json())
+    document.getElementById("selectOptionTrack").innerHTML = ""
+    var x = "<option disabled selected>Válassz versenyt...</option>"
+    if (res.length > 0) {
+        res.forEach(i => {
+            x += `
+            <option value="${i.id}">${i.number} - ${i.name} (${i.code})</option>
+            `
+        })
+    }
+    document.getElementById("selectOptionTrack").innerHTML += x
+}
+
+// versenyzők generálása?

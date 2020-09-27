@@ -4,18 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SRL - Admin</title>
-    <script src="js/script.js"></script>
-    <link rel="stylesheet" href="css/main.css">
+    <script src="../js/script.js"></script>
+    <link rel="stylesheet" href="../css/main.css">
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
 </head>
-<body onload="session('index.html'); getAllSeasonSelectOption()">
+<body onload="session('../index.html'); getAllSeasonSelectOption();">
     <header>
         <nav class="navbar navbar-expand-md navbar-light bg-light">
-            <a class="navbar-brand" href="index.html">SRL</a>
+            <a class="navbar-brand" href="../index.html">SRL</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
               <span class="navbar-toggler-icon"></span>
             </button>
@@ -23,19 +23,19 @@
             <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
               <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
-                  <a class="nav-link" href="adminseason.html">Szezonok</a>
+                  <a class="nav-link" href="season.html">Szezonok</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="track.html">Versenyek</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="team.html">Csapatok</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="racer.html">Versenyzők</a>
                 </li>
                 <li class="nav-item active">
-                  <a class="nav-link" href="admintrack.html">Pályák</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="adminteam.html">Csapatok</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="adminracer.html">Versenyzők</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="adminpoint.html">Helyezések</a>
+                    <a class="nav-link" href="point.html">Helyezések</a>
                 </li>
               </ul>
               <button class="btn btn-outline-danger" onclick="logout()">Kijelentkezés</button>
@@ -46,9 +46,15 @@
     <section class="container pt-5">
         <div class="row">
           <div class="col-md-6">
+            <h1>Helyezések</h1>
             <div class="form-group">
-              <select class="form-control" id="selectOptionSeason" onchange="getAllTrack()">
+              <select class="form-control" id="selectOptionSeason" onchange="getAllTrackSelectOption()">
                 <option disabled selected>Válassz szezont...</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <select class="form-control" id="selectOptionTrack" onchange="getAllRacer()">
+                <option disabled selected>Válassz versenyt...</option>
               </select>
             </div>
           </div>
@@ -56,24 +62,17 @@
       </section>
 
       <section id="table" class="container pt-5 hidden">
-        <div class="row">
-            <div class="col-6">
-                <h1>Szezonok</h1>
-            </div>
-            <div class="col-6 pt-1">
-                <button class="btn btn-primary float-right" data-toggle="modal" data-target="#insertModal">Hozzáadás</button>
-            </div>
-        </div>
+        <button class="btn btn-primary float-right my-1" data-toggle="modal" data-target="#insertModal">Hozzáadás</button>
         <table class="table table-striped">
             <thead>
               <tr>
-                <th>Sorszám</th>
-                <th>Kód</th>
                 <th>Név</th>
-                <th></th>
+                <th>Csapat</th>
+                <th>Helyezés</th>
+                <th>Pont</th>
               </tr>
             </thead>
-            <tbody id="adminTrack"></tbody>
+            <tbody id="tbody"></tbody>
           </table>
     </section>
 
