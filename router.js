@@ -29,5 +29,17 @@ router.get("/admin/track/one/:id", controller.getOneTrack)
 router.post("/admin/track", controller.addTrack)
 router.put("/admin/track/:id", controller.modifyTrack)
 router.delete("/admin/track/:id", controller.deleteTrack)
+//team
+router.get("/admin/team/:seasonId", controller.getAllTeam)
+router.get("/admin/team/one/:id", controller.getOneTeam)
+router.post("/admin/team", controller.addTeam)
+router.put("/admin/team/:id", controller.modifyTeam)
+router.delete("/admin/team/:id", controller.deleteTeam)
+//racer
+router.get("/admin/racer/:seasonId", controller.getAllRacer)
+router.get("/admin/racer/one/:id", controller.getOneRacer)
+router.post("/admin/racer", controller.addRacer)
+router.put("/admin/racer/:id", controller.modifyRacer)
+router.delete("/admin/racer/:id", controller.deleteRacer)
 
 module.exports = router

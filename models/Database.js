@@ -121,40 +121,121 @@ class Database {
     // tracks
 
     getAllTrack(req, callback) {
-        var sql = `SELECT * FROM season_track WHERE season_id = "${req.params.seasonId}" ORDER BY number ASC`
+        var sql = `SELECT * FROM track WHERE season_id = "${req.params.seasonId}" ORDER BY number ASC`
         this.conn.query(sql, (err, result) => {
             return callback(result)
         })
     }
 
     getOneTrack(req, callback) {
-        var sql = `SELECT * FROM season_track WHERE id = "${req.params.id}"`
+        var sql = `SELECT * FROM track WHERE id = "${req.params.id}"`
         this.conn.query(sql, (err, result) => {
             return callback(result[0])
         })
     }
 
-    addTrack(req, callback) {
-        this.generateNewHashedId(`season_track`)
-        var sql = `INSERT INTO season_track (id, season_id, number, code, name) VALUES ("${this.hashedId}", "${req.body.seasonId}", ${req.body.number},"${req.body.code}", "${req.body.name}")`
-        this.conn.query(sql, (err) => {
-            if (err)
-                return callback({ error: "Az adatoknak egyedieknek kell lenniük!" })
-            return callback({ success: "Sikeres művelet!" })
+    checkTrack(req, callback) {
+        this.conn.query(`SELECT * FROM track WHERE season_id = "${req.body.seasonId}" AND (name = "${req.body.name}" OR code = "${req.body.code}" OR number=${req.body.number})`, (err, result) => {
+            return callback(result)
         })
     }
 
-    modifyTrack(req, callback) {
-        var sql = `UPDATE season_track SET number = "${req.body.number}", code = "${req.body.code}", name = "${req.body.name}" WHERE id = "${req.params.id}"`
-        this.conn.query(sql, (err) => {
-            if (err)
-                return callback({ error: "Az adatoknak egyedieknek kell lenniük!" })
-            return callback({ success: "Sikeres művelet!" })
-        })
+    addTrack(req) {
+        this.generateNewHashedId(`track`)
+        var sql = `INSERT INTO track (id, season_id, number, code, name) VALUES ("${this.hashedId}", "${req.body.seasonId}", ${req.body.number},"${req.body.code}", "${req.body.name}")`
+        this.conn.query(sql)
+    }
+
+    modifyTrack(req) {
+        var sql = `UPDATE track SET number = "${req.body.number}", code = "${req.body.code}", name = "${req.body.name}" WHERE id = "${req.params.id}"`
+        this.conn.query(sql)
     }
 
     deleteTrack(req) {
-        var sql = `DELETE FROM season_track WHERE id = "${req.params.id}"`
+        var sql = `DELETE FROM track WHERE id = "${req.params.id}"`
+        this.conn.query(sql)
+    }
+
+    // teams
+
+    getAllTeam(req, callback) {
+        var sql = `SELECT * FROM team WHERE season_id = "${req.params.seasonId}"`
+        this.conn.query(sql, (err, result) => {
+            return callback(result)
+        })
+    }
+
+    getOneTeam(req, callback) {
+        var sql = `SELECT * FROM team WHERE id = "${req.params.id}"`
+        this.conn.query(sql, (err, result) => {
+            return callback(result[0])
+        })
+    }
+
+    checkTeam(req, callback) {
+        this.conn.query(`SELECT * FROM team WHERE season_id = "${req.body.seasonId}" AND name = "${req.body.name}"`, (err, result) => {
+            return callback(result)
+        })
+    }
+
+    addTeam(req) {
+        this.generateNewHashedId(`team`)
+        var sql = `INSERT INTO team (id, season_id, name, color) VALUES ("${this.hashedId}", "${req.body.seasonId}", "${req.body.name}", "${req.body.color}")`
+        this.conn.query(sql)
+    }
+
+    modifyTeam(req) {
+        var sql = `UPDATE team SET name = "${req.body.name}", color = "${req.body.color}" WHERE id = "${req.params.id}"`
+        this.conn.query(sql)
+    }
+
+    deleteTeam(req) {
+        var sql = `DELETE FROM team WHERE id = "${req.params.id}"`
+        this.conn.query(sql)
+    }
+
+    // racers
+
+    getAllRacer(req, callback) {
+        // getTeam
+        var sql = `SELECT r.id AS rid, r.name AS rname, t.id AS tid, t.name AS tname
+        FROM racer r
+        LEFT JOIN team t ON r.team_id = t.id
+        WHERE r.season_id = "${req.params.seasonId}"`
+        this.conn.query(sql, (err, result) => {
+            return callback(result)
+        })
+    }
+
+    getOneRacer(req, callback) {
+        var sql = `SELECT r.id AS rid, r.name AS rname, t.id AS tid, t.name AS tname
+        FROM racer r
+        LEFT JOIN team t ON r.team_id = t.id
+        WHERE r.id = "${req.params.id}"`
+        this.conn.query(sql, (err, result) => {
+            return callback(result[0])
+        })
+    }
+
+    checkRacer(req, callback) {
+        this.conn.query(`SELECT * FROM racer WHERE season_id = "${req.body.seasonId}" AND name = "${req.body.name}"`, (err, result) => {
+            return callback(result)
+        })
+    }
+
+    addRacer(req) {
+        this.generateNewHashedId(`racer`)
+        var sql = `INSERT INTO racer (id, season_id, team_id, name) VALUES ("${this.hashedId}", "${req.body.seasonId}", "${req.body.teamId}", "${req.body.name}")`
+        this.conn.query(sql)
+    }
+
+    modifyRacer(req) {
+        var sql = `UPDATE racer SET name = "${req.body.name}", team_id = "${req.body.teamId}" WHERE id = "${req.params.id}"`
+        this.conn.query(sql)
+    }
+
+    deleteRacer(req) {
+        var sql = `DELETE FROM racer WHERE id = "${req.params.id}"`
         this.conn.query(sql)
     }
 

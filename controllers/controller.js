@@ -193,9 +193,15 @@ exports.addTrack = (req, res) => {
         res.json({ error: "Valami nincs kitöltve!" })
         else {
             var db = new Database()
-            db.addTrack(req, (result) => {
-                res.json(result)
-                db.end()
+            db.checkTrack(req, (result) => {
+                if (result.length > 0) {
+                    res.json({ error: "Ez a verseny már benne van a szezonban!" })
+                    db.end()
+                } else {
+                    db.addTrack(req)
+                    res.json({ success: "Sikeres művelet!" })
+                    db.end()
+                }
             })
         }
     }
@@ -209,9 +215,15 @@ exports.modifyTrack = (req, res) => {
             res.json({ error: "Valami nincs kitöltve!" })
         else {
             var db = new Database()
-            db.modifyTrack(req, (result) => {
-                res.json(result)
-                db.end()
+            db.checkTrack(req, (result) => {
+                if (result.length > 0) {
+                    res.json({ error: "Ez a verseny már benne van a szezonban!" })
+                    db.end()
+                } else {
+                    db.modifyTrack(req)
+                    res.json({ success: "Sikeres művelet!" })
+                    db.end()
+                }
             })
         }
     }
@@ -227,6 +239,172 @@ exports.deleteTrack = (req, res) => {
                 bcrypt.decrypt(req.body.password, result[0].password, (hash) => {
                 if (hash) {
                     db.deleteTrack(req)
+                    res.json({ success: "Sikeres művelet!" })
+                    db.end()
+                } else {
+                    res.json({ error: "Sikertelen művelet!" })
+                    db.end()
+                }
+            })
+        })
+    }
+}
+
+// teams
+
+exports.getAllTeam = (req, res) => {
+    var db = new Database()
+    db.getAllTeam(req, (result) => {
+        res.send(result)
+        db.end()
+    })
+}
+
+exports.getOneTeam = (req, res) => {
+    var db = new Database()
+    db.getOneTeam(req, (result) => {
+        res.send(result)
+        db.end()
+    })
+}
+
+exports.addTeam = (req, res) => {
+    if (req.session.userId == null)
+        res.end()
+    else {
+        if (req.body.name == "" || req.body.code == "" || req.body.number == "")
+        res.json({ error: "Valami nincs kitöltve!" })
+        else {
+            var db = new Database()
+            db.checkTeam(req, (result) => {
+                if (result.length > 0) {
+                    res.json({ error: "Ez a csapat már benne van a szezonban!" })
+                    db.end()
+                } else {
+                    db.addTeam(req)
+                    res.json({ success: "Sikeres művelet!" })
+                    db.end()
+                }
+            })
+        }
+    }
+}
+
+exports.modifyTeam = (req, res) => {
+    if (req.session.userId == null)
+        res.end()
+    else {
+        if (req.body.name == "")
+            res.json({ error: "Nincs név megadva!" })
+        else {
+            var db = new Database()
+            db.checkTeam(req, (result) => {
+                if (result.length > 0) {
+                    res.json({ error: "Ez a csapat már benne van a szezonban!" })
+                    db.end()
+                } else {
+                    db.modifyTeam(req)
+                    res.json({ success: "Sikeres művelet!" })
+                    db.end()
+                }
+            })
+        }
+    }
+}
+
+exports.deleteTeam = (req, res) => {
+    if (req.session.userId == null)
+        res.end()
+    else {
+        var db = new Database()
+        var bcrypt = new Bcrypt()
+        db.passwordValidate(req, (result) => {
+                bcrypt.decrypt(req.body.password, result[0].password, (hash) => {
+                if (hash) {
+                    db.deleteTeam(req)
+                    res.json({ success: "Sikeres művelet!" })
+                    db.end()
+                } else {
+                    res.json({ error: "Sikertelen művelet!" })
+                    db.end()
+                }
+            })
+        })
+    }
+}
+
+// racers
+
+exports.getAllRacer = (req, res) => {
+    var db = new Database()
+    db.getAllRacer(req, (result) => {
+        res.send(result)
+        db.end()
+    })
+}
+
+exports.getOneRacer = (req, res) => {
+    var db = new Database()
+    db.getOneRacer(req, (result) => {
+        res.send(result)
+        db.end()
+    })
+}
+
+exports.addRacer = (req, res) => {
+    if (req.session.userId == null)
+        res.end()
+    else {
+        if (req.body.name == "" || req.body.code == "" || req.body.number == "")
+        res.json({ error: "Valami nincs kitöltve!" })
+        else {
+            var db = new Database()
+            db.checkRacer(req, (result) => {
+                if (result.length > 0) {
+                    res.json({ error: "Ez a csapat már benne van a szezonban!" })
+                    db.end()
+                } else {
+                    db.addRacer(req)
+                    res.json({ success: "Sikeres művelet!" })
+                    db.end()
+                }
+            })
+        }
+    }
+}
+
+exports.modifyRacer = (req, res) => {
+    if (req.session.userId == null)
+        res.end()
+    else {
+        if (req.body.name == "")
+            res.json({ error: "Nincs név megadva!" })
+        else {
+            var db = new Database()
+            db.checkRacer(req, (result) => {
+                if (result.length > 0) {
+                    res.json({ error: "Ez a csapat már benne van a szezonban!" })
+                    db.end()
+                } else {
+                    db.modifyRacer(req)
+                    res.json({ success: "Sikeres művelet!" })
+                    db.end()
+                }
+            })
+        }
+    }
+}
+
+exports.deleteRacer = (req, res) => {
+    if (req.session.userId == null)
+        res.end()
+    else {
+        var db = new Database()
+        var bcrypt = new Bcrypt()
+        db.passwordValidate(req, (result) => {
+                bcrypt.decrypt(req.body.password, result[0].password, (hash) => {
+                if (hash) {
+                    db.deleteRacer(req)
                     res.json({ success: "Sikeres művelet!" })
                     db.end()
                 } else {
