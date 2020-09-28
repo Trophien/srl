@@ -927,4 +927,50 @@ async function getAllTrackSelectOption() {
     document.getElementById("selectOptionTrack").innerHTML += x
 }
 
+async function getAllRacerSelectOption() {
+    var seasonId = document.getElementById("selectOptionSeason").value
+    var res = await fetch(`${this.url}admin/racer/${seasonId}`, {
+        method: "GET"
+    }).then(res => res.json())
+    document.getElementById("selectOptionRacer").innerHTML = ""
+    var x = "<option disabled selected>Válassz versenyt...</option>"
+    if (res.length > 0) {
+        res.forEach(i => {
+            x += `
+            <option value="${i.rid}">${i.rname} (${i.tname})</option>`
+        })
+    }
+    document.getElementById("selectOptionRacer").innerHTML += x
+}
+
 // versenyzők generálása?
+
+/*async function getAllPoint() {
+    document.getElementById("table").classList.remove("hidden")
+    var seasonId = document.getElementById("selectOptionSeason").value
+    document.getElementById("tbody").innerHTML = ""
+    var res = await fetch(`${this.url}admin/racer/${seasonId}`, {
+        method: "GET"
+    }).then(res => res.json())
+    var x = ""
+    if (res.length > 0) {
+        res.forEach(i => {
+            x += `
+            <tr>
+                <td>
+                    <p>${i.rname}</p>
+                </td>
+                <td>
+                    <p>${i.tname}</p>
+                </td>
+                <td>
+                    
+                </td>
+            </tr>
+            `
+        })
+    } else {
+        x += `<tr><td colspan="3">Még nincs versenyző felvéve.</td></tr>`
+    }
+    document.getElementById("tbody").innerHTML += x 
+}*/

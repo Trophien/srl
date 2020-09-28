@@ -239,6 +239,46 @@ class Database {
         this.conn.query(sql)
     }
 
+    // points
+    /*getAllRacerPoint(req, callback) {
+        var sql = `SELECT r.id AS rid, r.name AS rname, te.id AS tid, te.name AS tname
+        FROM racer r
+        LEFT JOIN team te ON r.team_id = te.id
+        LEFT JOIN season s ON r.season_id = s.id
+        LEFT JOIN track tr ON s.id = tr.season_id
+        WHERE tr.id = "${req.params.trackId}"`
+        this.conn.query(sql, (err, result) => {
+            return callback(result)
+        })
+    }
+
+    getAllPoint(req, callback) {
+        // getTeam
+        var sql = `SELECT r.id AS rid, r.name AS rname, te.id AS tid, te.name AS tname, p.position, p.point
+        FROM point p
+        -- LEFT JOIN season s ON p.season_id = s.id
+        -- LEFT JOIN track tr ON p.track_id = tr.id
+        LEFT JOIN team te ON p.team_id = te.id
+        LEFT JOIN racer r ON p.racer_id = r.id
+        WHERE track_id = "${req.params.trackId}"`
+        this.conn.query(sql, (err, result) => {
+            return callback(result)
+        })
+    }*/
+
+    getOnePoint(req, callback) {
+        var sql = `SELECT r.id AS rid, r.name AS rname, te.id AS tid, te.name AS tname, p.position, p.point
+        FROM point p
+        -- LEFT JOIN season s ON p.season_id = s.id
+        -- LEFT JOIN track tr ON p.track_id = tr.id
+        LEFT JOIN team te ON p.team_id = te.id
+        LEFT JOIN racer r ON p.racer_id = r.id
+        WHERE track_id = "${req.params.trackId}" AND racer_id = "${req.params.racerId}"`
+        this.conn.query(sql, (err, result) => {
+            return callback(result)
+        })
+    }
+
     end() {
         this.conn.end()
     }

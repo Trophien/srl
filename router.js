@@ -41,5 +41,7 @@ router.get("/admin/racer/one/:id", controller.getOneRacer)
 router.post("/admin/racer", controller.addRacer)
 router.put("/admin/racer/:id", controller.modifyRacer)
 router.delete("/admin/racer/:id", controller.deleteRacer)
+//point
+router.get("/admin/point/:trackId/:racerId", controller.getOnePoint)
 
 module.exports = router

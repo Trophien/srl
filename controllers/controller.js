@@ -415,3 +415,18 @@ exports.deleteRacer = (req, res) => {
         })
     }
 }
+
+// point
+
+exports.getAllPoint = (req, res) => {
+    var db = new Database()
+    db.getAllPoint(req, (result) => {
+        if (result.length == 0) {
+            db.getAllRacer(req, (result) => {
+                
+            })
+        }
+        res.send(result)
+        db.end()
+    })
+}
