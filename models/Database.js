@@ -275,7 +275,7 @@ class Database {
         LEFT JOIN racer r ON p.racer_id = r.id
         WHERE track_id = "${req.params.trackId}" AND racer_id = "${req.params.racerId}"`
         this.conn.query(sql, (err, result) => {
-            return callback(result)
+            return callback(result[0])
         })
     }
 
