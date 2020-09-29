@@ -272,7 +272,7 @@ exports.addTeam = (req, res) => {
     if (req.session.userId == null)
         res.end()
     else {
-        if (req.body.name == "" || req.body.code == "" || req.body.number == "")
+        if (req.body.name == "")
         res.json({ error: "Valami nincs kitöltve!" })
         else {
             var db = new Database()
@@ -355,13 +355,15 @@ exports.addRacer = (req, res) => {
     if (req.session.userId == null)
         res.end()
     else {
-        if (req.body.name == "" || req.body.code == "" || req.body.number == "")
-        res.json({ error: "Valami nincs kitöltve!" })
+        if (req.body.name == "" || req.body.teamId == "")
+            res.json({ error: "Nincs név megadva!" })
+        else if (req.body.teamId == "")
+            res.json({ error: "Nem választottál csapatot!" })
         else {
             var db = new Database()
             db.checkRacer(req, (result) => {
                 if (result.length > 0) {
-                    res.json({ error: "Ez a csapat már benne van a szezonban!" })
+                    res.json({ error: "Ez a versenyző már benne van a szezonban!" })
                     db.end()
                 } else {
                     db.addRacer(req)
@@ -383,7 +385,7 @@ exports.modifyRacer = (req, res) => {
             var db = new Database()
             db.checkRacer(req, (result) => {
                 if (result.length > 0) {
-                    res.json({ error: "Ez a csapat már benne van a szezonban!" })
+                    res.json({ error: "Ez a versenyző már benne van a szezonban!" })
                     db.end()
                 } else {
                     db.modifyRacer(req)
@@ -431,5 +433,17 @@ exports.getOnePoint = (req, res) => {
             res.send(result)
             db.end()
         }
+    })
+}
+
+exports.addPoint = (req, res) => {
+    var db = new Database()
+    db.getOnePoint(req, (result) => {
+        if (result == null)
+            db.addPoint()
+        else
+            db.modifyPoint()
+        res.end()
+        db.end()
     })
 }

@@ -201,7 +201,7 @@ class Database {
         var sql = `SELECT r.id AS rid, r.name AS rname, t.id AS tid, t.name AS tname
         FROM racer r
         LEFT JOIN team t ON r.team_id = t.id
-        WHERE r.season_id = "${req.params.seasonId}"`
+        WHERE t.season_id = "${req.params.seasonId}"`
         this.conn.query(sql, (err, result) => {
             return callback(result)
         })
@@ -218,7 +218,11 @@ class Database {
     }
 
     checkRacer(req, callback) {
-        this.conn.query(`SELECT * FROM racer WHERE season_id = "${req.body.seasonId}" AND name = "${req.body.name}"`, (err, result) => {
+        var sql = `SELECT r.id 
+        FROM racer r
+        LEFT JOIN team t ON r.team_id = t.id
+        WHERE t.season_id = "${req.body.seasonId}" AND r.name = "${req.body.name}"`
+        this.conn.query(sql, (err, result) => {
             return callback(result)
         })
     }
@@ -277,6 +281,12 @@ class Database {
         this.conn.query(sql, (err, result) => {
             return callback(result[0])
         })
+    }
+
+    addPoint(req, callback) {
+        this.generateNewHashedId(`points`)
+        var sql = `INSERT INTO point(id, track_id, team_id, racer_id, position, point) VALUES ("${this.hashedId}", "${req.body.trid}", "${req.body.teid}", "${req.body.rid}", "${req.body.position}", ${req.body.point})`
+        this.conn.query(sql)
     }
 
     end() {

@@ -58,15 +58,54 @@
               </select>
             </div>
             <div class="form-group">
-              <select class="form-control" id="selectOptionRacer" onchange="getOneRacerPoint()">
-                <option disabled selected>Válassz versenyt...</option>
+              <select class="form-control" id="selectOptionRacer" onchange="getOnePoint()">
+                <option disabled selected>Válassz versenyzőt...</option>
               </select>
             </div>
           </div>
         </div>
       </section>
 
-      <section id="table" class="container pt-5 hidden">
+      <section id="form" class="container hidden pt-5">
+        <div class="row">
+          <div class="col-md-8">
+            <h3 id="racerName"></h3>
+            <div class="form-group">
+              <select class="form-control" id="selectOptionModifyTeam">
+                <option disabled selected>Válassz csapatot...</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <input class="form-control" type="text" id="inputPosition" placeholder="Position" oninput="btnAddPoint()">
+              <small class="text-muted">(1st, 2nd, 3rd, 4th, DNF, DNS, DSQ...)</small>
+            </div>
+            <!--<div class="form-group">
+              <div class="input-group">
+                <input class="form-control" type="number" id="inputPoint" placeholder="Points" oninput="btnAddPoint()">
+                <div class="input-group-append">
+                  <p>pts.</p>
+                </div>
+              </div>
+            </div>-->
+
+            <div class="form-group">
+              <div class="input-group">
+                <input class="form-control" type="number" id="inputPoint" placeholder="Points" oninput="btnAddPoint()">
+                <div class="input-group-append">
+                  <span class="input-group-text">pts.</span>
+                </div>
+              </div>
+            </div>
+
+
+
+
+            <button class="btn btn-primary float-right" id="btnAddPoint" disabled>Rögzítés</button>
+          </div>
+        </div>
+      </section>
+
+      <!--<section id="table" class="container pt-5 hidden">
         <button class="btn btn-primary float-right my-1" data-toggle="modal" data-target="#insertModal">Hozzáadás</button>
         <table class="table table-striped">
             <thead>
@@ -79,9 +118,9 @@
             </thead>
             <tbody id="tbody"></tbody>
           </table>
-    </section>
+    </section>-->
 
-    <!-- modal -->
+    <!-- modal 
     <div class="modal fade" id="insertModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog" role="document">
               <div class="modal-content">
@@ -109,10 +148,7 @@
                   </div>
               </div>
             </div>
-      </div>
+      </div>-->
   
-      <div id="deleteForm"></div>
-      <div id="modifyForm"></div>
-      <!-- res -->
       <div id="response"></div>
 </body>

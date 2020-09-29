@@ -737,7 +737,7 @@ async function getAllTeamSelectOption() {
         method: "GET"
     }).then(res => res.json())
     document.getElementById("selectOptionTeam").innerHTML = ""
-    var x = "<option disabled selected>Válassz csapatot...</option>"
+    var x = "<option value='' disabled selected>Válassz csapatot...</option>"
     if (res.length > 0) {
         res.forEach(i => {
             x += `
@@ -776,6 +776,7 @@ async function getAllTeamSelectOptionModify(teamId) {
     var res = await fetch(`${this.url}admin/team/${seasonId}`, {
         method: "GET"
     }).then(res => res.json())
+    document.getElementById("selectOptionModifyTeam").innerHTML = ""
     var x = "<option disabled>Válassz csapatot...</option>"
     if (res.length > 0) {
         res.forEach(i => {
@@ -928,12 +929,13 @@ async function getAllTrackSelectOption() {
 }
 
 async function getAllRacerSelectOption() {
+    // benne van-e a ponttáblázatba?
     var seasonId = document.getElementById("selectOptionSeason").value
     var res = await fetch(`${this.url}admin/racer/${seasonId}`, {
         method: "GET"
     }).then(res => res.json())
     document.getElementById("selectOptionRacer").innerHTML = ""
-    var x = "<option disabled selected>Válassz versenyt...</option>"
+    var x = "<option disabled selected>Válassz versenyzőt...</option>"
     if (res.length > 0) {
         res.forEach(i => {
             x += `
@@ -943,34 +945,27 @@ async function getAllRacerSelectOption() {
     document.getElementById("selectOptionRacer").innerHTML += x
 }
 
-// versenyzők generálása?
-
-/*async function getAllPoint() {
-    document.getElementById("table").classList.remove("hidden")
+async function getOnePoint() {
+    document.getElementById("form").classList.remove("hidden")
     var seasonId = document.getElementById("selectOptionSeason").value
-    document.getElementById("tbody").innerHTML = ""
-    var res = await fetch(`${this.url}admin/racer/${seasonId}`, {
+    var trackId = document.getElementById("selectOptionTrack").value
+    var racerId = document.getElementById("selectOptionRacer").value
+    var res = await fetch(`${this.url}admin/point/${trackId}/${racerId}`, {
         method: "GET"
     }).then(res => res.json())
-    var x = ""
-    if (res.length > 0) {
-        res.forEach(i => {
-            x += `
-            <tr>
-                <td>
-                    <p>${i.rname}</p>
-                </td>
-                <td>
-                    <p>${i.tname}</p>
-                </td>
-                <td>
-                    
-                </td>
-            </tr>
-            `
-        })
-    } else {
-        x += `<tr><td colspan="3">Még nincs versenyző felvéve.</td></tr>`
+
+    document.getElementById("racerName").innerHTML = res.rname
+    getAllTeamSelectOptionModify(res.team)
+    
+    if (res.position != undefined && res.point != undefined) {
+        document.getElementById("inputPosition").value = res.position
+        document.getElementById("inputPoint").value = res.point
     }
-    document.getElementById("tbody").innerHTML += x 
-}*/
+}
+
+function btnAddPoint() {
+    if (document.getElementById("inputPosition").value != "" && document.getElementById("inputPoint").value != "")
+        document.getElementById("btnAddPoint").disabled = false
+    else
+        document.getElementById("btnAddPoint").disabled = true
+}
